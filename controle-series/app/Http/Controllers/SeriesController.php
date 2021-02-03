@@ -2,20 +2,53 @@
 
 namespace App\Http\Controllers;
 
+use App\Serie;
+use Illuminate\Http\Request;
+
 class SeriesController extends Controller
 {
-    public function index(){
-        $series = [
-            'Lost',
-            'Agents of Shield',
-            'Wandavision'
-        ];
+    public function index(Request $request){
+        $series = Serie::query()
+            ->orderBy('nome')
+            ->get();
 
-        return view('series.index', compact('series'));
+        $mensagem = $request->session()->get('mensagem');
+        
+
+
+        return view('series.index', compact('series', 'mensagem'));
     }
 
     public function create()
     {
         return view('series.create');
+    }
+
+    public function store(Request $request)
+    {   
+        //lança exessao e redireciona
+        $request->validate([
+            'nome' => 'required|min:3|max:100'
+        ]);
+
+        $serie = Serie::create($request->all());
+        $request->session()
+        ->flash(
+            'mensagem',
+            "Serie {$serie->id} criada com sucesso {$serie->nome}"
+        );
+
+        return redirect()->route('listar_series');
+    }
+
+    public function destroy(Request $request)
+    {
+        Serie::destroy($request->id);
+        $request->session()
+        ->flash(
+            'mensagem',
+            "Serie removida com sucesso criada com sucesso"
+        );
+        return redirect()->route('listar_series');
     }
 }
