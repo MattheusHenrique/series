@@ -1,2 +1,2 @@
 # series
- aprendendo laravel alura
+ aprendendo framework laravel 
